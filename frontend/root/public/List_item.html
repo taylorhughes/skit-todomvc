@@ -1,4 +1,4 @@
-<li {{#if id }}data-item-id="{{ id }}"{{/if}}>
+<li {{#if id }}data-item-id="{{ id }}"{{/if}} {{#if completed }} class="completed"{{/if}}>
   <div class="view">
     <input class="toggle" type="checkbox" data-action="complete-item" {{#if completed}} checked{{/if}}>
     <label data-action="edit-item">{{ text }}</label>

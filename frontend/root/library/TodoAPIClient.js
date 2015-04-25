@@ -86,8 +86,9 @@ TodoAPIClient.prototype.purgeCompletedItems = function(listId, callbacks) {
 };
 
 
-TodoAPIClient.prototype.markAllCompleted = function(listId, callbacks) {
+TodoAPIClient.prototype.markAllCompleted = function(listId, completed, callbacks) {
   this.send_('lists/' + listId + '/mark-all-completed', {
+    params: {'completed': completed ? '1' : '0'},
     method: 'POST',
     parse: function(data) {
       return [data['list'], data['items']];
@@ -117,10 +118,10 @@ TodoAPIClient.prototype.newItem = function(listId, text, callbacks) {
   });
 };
 
-TodoAPIClient.prototype.markItemCompleted = function(listId, itemId, callbacks) {
+TodoAPIClient.prototype.markItemCompleted = function(listId, itemId, completed, callbacks) {
   this.send_('lists/' + listId + '/' + itemId, {
     method: 'POST',
-    params: {'completed': '1'},
+    params: {'completed': completed ? '1' : '0'},
     parse: function(data) {
       return [data['item']];
     },

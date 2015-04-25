@@ -92,10 +92,13 @@ class MarkAllCompletedListHandler(BaseHandler):
   @_list_handler_method
   def post(self, my_list):
     items = db.query_descendants(my_list)
+
+    completed = self.request.get('completed') != '0'
+
     to_put = []
     for item in items:
-      if not item.completed:
-        item.completed = True
+      if item.completed != completed:
+        item.completed = completed
         to_put.append(item)
     if to_put:
       # Saves all the items at once.
@@ -112,7 +115,7 @@ class PurgeCompletedListHandler(BaseHandler):
     to_delete = []
     for item in items:
       if item.completed:
-        to_delete.push(item)
+        to_delete.append(item)
         my_list.task_count -= 1
 
     if to_delete:

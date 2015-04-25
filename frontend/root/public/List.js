@@ -75,7 +75,7 @@ return Controller.create({
       items: this.filterItems(this.items),
       remaining: remaining,
       anyCompleted: anyCompleted,
-      filterName: this.filterNam
+      filterName: this.filterName
     });
   },
 
@@ -110,6 +110,55 @@ return Controller.create({
     });
   },
 
+  purgeCompleted: function() {
+    var oldItems = this.items.slice();
+    this.items = iter.filter(this.items, function(item) {
+      return !item.completed;
+    });
+    this.rerender();
+
+    TodoAPIClient.purgeCompletedItems(this.list.id, {
+      error: function() {
+        this.items = oldItems;
+        this.rerender();
+      },
+      context: this
+    })
+  },
+
+  markAllCompleted: function() {
+    var hasAnyActive = false;
+    iter.forEach(this.items, function(item, i, stop) {
+      if (!item.completed) {
+        hasAnyActive = true;
+        stop();
+      }
+    });
+
+    var completed = hasAnyActive;
+    var changed = [];
+    iter.forEach(this.items, function(item) {
+      if (item.completed != completed) {
+        item.completed = completed;
+        changed.push(item);
+      }
+    });
+
+    this.rerender();
+
+    TodoAPIClient.markAllCompleted(this.list.id, completed, {
+      error: function() {
+        iter.forEach(changed, function(item) {
+          item.completed = !completed;
+        });
+        this.rerender();
+      },
+      context: this
+    })
+  },
+
+  // Event handlers
+
   onClickAction: function(evt) {
     var $target = evt.currentTarget;
     var action = $target.getData('action');
@@ -130,9 +179,9 @@ return Controller.create({
         break;
 
       case 'complete-item':
-        item.completed = true;
+        item.completed = !item.completed;
         this.rerender();
-        TodoAPIClient.markItemCompleted(this.list.id, item.id);
+        TodoAPIClient.markItemCompleted(this.list.id, item.id, item.completed);
         break;
 
       case 'destroy-item':
@@ -163,7 +212,6 @@ return Controller.create({
     var tempId = +(new Date());
     var added = {id: null, text: text, completed: false, tempId: tempId};
     this.items.push(added);
-    this.list.taskCount += 1;
     this.rerender();
 
     dom.get('input[autofocus]').element.focus();
