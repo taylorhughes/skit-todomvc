@@ -1,0 +1,16 @@
+<span id="todo-count"><strong>{{ remaining }}</strong> {{pluralize remaining "item" "items" }} left</span>
+<ul id="filters">
+  <li>
+    <a {{#ifEqual filterName "all" }}class="selected"{{/ifEqual}} href="/">All</a>
+  </li>
+  <li>
+    <a {{#ifEqual filterName "active" }}class="selected"{{/ifEqual}} href="/active">Active</a>
+  </li>
+  <li>
+    <a {{#ifEqual filterName "completed" }}class="selected"{{/ifEqual}} href="/completed">Completed</a>
+  </li>
+</ul>
+
+{{#if anyCompleted }}
+  <button id="clear-completed" data-action="purge-completed">Clear completed</button>
+{{/if}}
