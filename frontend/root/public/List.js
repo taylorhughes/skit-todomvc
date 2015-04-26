@@ -34,11 +34,11 @@ Handlebars.registerHelper('ifEqual', function(a, b, opts) {
 
 return Controller.create({
   __preload__: function(done) {
+    this.list = null;
+    this.items = [];
+
     var listId = cookies.get(COOKIE_NAME);
     if (!listId) {
-      this.list = null;
-      this.items = [];
-
       done();
       return;
     }
@@ -47,9 +47,6 @@ return Controller.create({
       success: function(list, items) {
         this.list = list;
         this.items = items;
-      },
-      error: function() {
-        navigation.notFound();
       },
       complete: done,
       context: this
