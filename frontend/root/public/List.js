@@ -189,6 +189,7 @@ return Controller.create({
           return item !== anItem;
         });
         this.rerender();
+        TodoAPIClient.deleteItem(this.list.id, item.id);
         break;
 
       case 'edit-item':

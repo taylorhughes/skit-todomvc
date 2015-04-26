@@ -14,9 +14,10 @@ class BaseHandler(webapp2.RequestHandler):
   def dispatch(self):
     # Allow these handlers to be accessed from anywhere.
     self.response.headers['Access-Control-Allow-Origin'] = '*'
+    self.response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS, DELETE'
     super(BaseHandler, self).dispatch()
 
-  def options(self):
+  def options(self, *args):
     # This allows the Allow-Origin header to be returned.
     pass
 
@@ -152,7 +153,7 @@ class EditTaskHandler(BaseHandler):
   @db.transactional
   @_task_handler_method
   def delete(self, my_list, task):
-    my_list.tasks_count -= 1
+    my_list.task_count -= 1
     my_list.put()
     task.delete()
 

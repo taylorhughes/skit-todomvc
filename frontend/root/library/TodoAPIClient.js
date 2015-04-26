@@ -140,5 +140,12 @@ TodoAPIClient.prototype.editItem = function(listId, itemId, text, callbacks) {
   });
 };
 
+TodoAPIClient.prototype.deleteItem = function(listId, itemId, callbacks) {
+  this.send_('lists/' + listId + '/' + itemId, {
+    method: 'DELETE',
+    callbacks: callbacks
+  });
+};
+
 
 return new TodoAPIClient();
