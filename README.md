@@ -22,16 +22,19 @@ Files of note:
  
 # How to run
 
-Run locally by:
+To run locally:
 
-1. Installing Google App Engine launcher __for python__ here: <a href="https://cloud.google.com/appengine/downloads">Google App Engine downloads</a>
+1. Install the Google App Engine launcher __for python__ here: <a href="https://cloud.google.com/appengine/downloads">Google App Engine downloads</a>
 2. In App Engine Launcher, import an existing project (the <code>backend</code> folder) and press play
-3. In <code>frontend</code> folder, run the project:
+3. Make sure your API host port matches the port in <code>library/TodoMVCClient.js</code>
+4. In the <code>frontend</code> folder, run the skit project
+
+To run and install the skit project:
 
     $ cd frontend
     $ npm install
     $ ./node_modules/.bin/skit run
 
-Voilà, you should be up and running.
+Voilà, there you have it.
 
 
