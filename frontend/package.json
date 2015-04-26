@@ -1,0 +1,9 @@
+{
+  "name": "skit-todomvc",
+  "dependencies": {
+    "skit": "latest"
+  },
+  "description": "...",
+  "readme": "...",
+  "repository": {}
+}
