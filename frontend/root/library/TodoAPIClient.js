@@ -4,6 +4,8 @@ var navigation = skit.platform.navigation;
 var net = skit.platform.net;
 var urls = skit.platform.urls;
 
+var LOCAL_BACKEND_PORT = -1;
+
 
 function TodoAPIClient() {}
 
@@ -11,9 +13,9 @@ function TodoAPIClient() {}
 TodoAPIClient.prototype.baseUrl_ = function() {
   if (!this.baseUrl) {
     var parsed = urls.parse(navigation.url());
-    if (parsed.port && parsed.port != 80 && parsed.port != 443) {
+    if (LOCAL_BACKEND_PORT > 0) {
       // running in dev mode.
-      this.baseUrl = 'http://localhost:15080/';
+      this.baseUrl = 'http://localhost:' + LOCAL_BACKEND_PORT + '/';
     } else {
       this.baseUrl = 'https://skit-todomvc.appspot.com/';
     }
