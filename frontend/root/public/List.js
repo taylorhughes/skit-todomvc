@@ -18,6 +18,7 @@ var itemHtml = __module__.item.html;
 
 var COOKIE_NAME = 'skit-task-list-id';
 var KEYCODE_ENTER = 13;
+var KEYCODE_ESC = 27;
 
 
 Handlebars.registerHelper('pluralize', function(count, singular, plural) {
@@ -53,6 +54,10 @@ return Controller.create({
     });
   },
 
+  __load__: function() {
+    this.clicks_ = {};
+  },
+
   __title__: function() {
     return 'Skit TodoMVC';
   },
@@ -77,8 +82,9 @@ return Controller.create({
   },
 
   __ready__: function(container) {
-    var app = dom.get('#todoapp');
-    events.delegate(app, '[data-action]', 'click', this.onClickAction, this);
+    this.$app = dom.get('#todoapp');
+    events.delegate(this.$app, '[data-action]', 'click', this.onClickAction, this);
+    events.delegate(this.$app, 'input.edit', 'keyup', this.onKeyupEdit, this);
     var newItem = dom.get('#new-todo');
     events.bind(newItem, 'keyup', this.onKeyupNewItem, this);
 
@@ -154,6 +160,28 @@ return Controller.create({
     })
   },
 
+  maybeEditItem: function($item, item) {
+    var lastClick = this.clicks_[item.id];
+    var now = +(new Date());
+    this.clicks_[item.id] = now;
+    if (!lastClick || (now - lastClick) > 250) {
+      return;
+    }
+
+    if ($item.hasClass('completed')) {
+      return;
+    }
+
+    iter.forEach(this.$app.find('#todo-list > li.editing'), function($item) {
+      $item.removeClass('editing');
+    });
+
+    $item.addClass('editing');
+    var input = $item.get('input.edit').element;
+    input.focus();
+    input.select();
+  },
+
   // Event handlers
 
   onClickAction: function(evt) {
@@ -190,7 +218,7 @@ return Controller.create({
         break;
 
       case 'edit-item':
-
+        this.maybeEditItem($item, item);
         break;
     }
   },
@@ -217,12 +245,16 @@ return Controller.create({
     TodoAPIClient.newItem(this.list.id, text, {
       success: function(newItem) {
         // Replace temporary item with real saved item from remote datasource.
-        this.items = iter.map(this.items, function(item) {
+        var index = iter.indexOf(this.items, function(item) {
           if (item.tempId == tempId) {
-            return newItem;
+            return true;
           }
-          return item;
+          return false;
         });
+
+        this.items[index] = newItem;
+        var $items = this.$app.find('#todo-list > li');
+        $items[index].setData('item-id', newItem.id);
       },
       error: function() {
         // Remove the item we added -- something went wrong.
@@ -232,5 +264,31 @@ return Controller.create({
       },
       context: this
     })
+  },
+
+  onKeyupEdit: function(evt) {
+    var isEnter = evt.keyCode == KEYCODE_ENTER;
+    var isEsc = evt.keyCode == KEYCODE_ESC;
+    if (!isEnter && !isEsc) {
+      return;
+    }
+    evt.preventDefault();
+
+    if (isEnter) {
+      var $input = evt.currentTarget;
+      var text = $input.value();
+      if (!text) {
+        return;
+      }
+
+      var $item = $input.up('[data-item-id]');
+      var itemId = $item.getData('item-id');
+      TodoAPIClient.editItem(this.list.id, itemId, text);
+
+      var item = this.itemById(itemId);
+      item.text = text;
+    }
+
+    this.rerender();
   }
 });
