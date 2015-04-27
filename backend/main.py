@@ -67,6 +67,7 @@ class ListHandler(BaseHandler):
   @_list_handler_method
   def get(self, my_list):
     items = db.query_descendants(my_list)
+    items = sorted(items, key=lambda i: i.create_time)
     self.json({'list': my_list.to_dict(), 'items': [i.to_dict() for i in items]})
 
   @db.transactional
