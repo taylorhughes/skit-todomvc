@@ -1,8 +1,6 @@
 'use strict';
 
-var navigation = skit.platform.navigation;
 var net = skit.platform.net;
-var urls = skit.platform.urls;
 
 var LOCAL_BACKEND_PORT = -1;
 
@@ -12,7 +10,6 @@ function TodoAPIClient() {}
 
 TodoAPIClient.prototype.baseUrl_ = function() {
   if (!this.baseUrl) {
-    var parsed = urls.parse(navigation.url());
     if (LOCAL_BACKEND_PORT > 0) {
       // running in dev mode.
       this.baseUrl = 'http://localhost:' + LOCAL_BACKEND_PORT + '/';
